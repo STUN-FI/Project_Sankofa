@@ -18,11 +18,8 @@ export default function LoginPage() {
         <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/50 via-slate-900 to-emerald-950/30 z-0" />
         
         {/* Top Branding Logo */}
-        <div className="relative z-10 flex items-center space-x-2 text-white font-bold text-xl tracking-tight">
-          <div className="h-8 w-8 rounded-lg bg-gradient-to-tr from-indigo-500 to-emerald-400 flex items-center justify-center text-sm">
-            ⚡
-          </div>
-          <span>STUN-FI NOTES</span>
+        <div className="relative z-10 flex items-center text-white font-bold text-xl tracking-tight">
+          <span>Lighthub.ed</span>
         </div>
 
         {/* Center Mockup / Marketing Hook */}
@@ -42,7 +39,7 @@ export default function LoginPage() {
 
         {/* Bottom Footer Note */}
         <div className="relative z-10 text-xs text-slate-500">
-          &copy; 2026 STUN-FI HUB. All rights reserved.
+          &copy; 2026 Lighthub.ed. All rights reserved.
         </div>
       </div>
 

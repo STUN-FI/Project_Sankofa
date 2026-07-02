@@ -29,10 +29,7 @@ export default function StudySpacePage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 justify-between items-center">
             <div className="flex items-center space-x-3">
-              <div className="h-8 w-8 rounded-lg bg-gradient-to-tr from-indigo-500 to-emerald-400 flex items-center justify-center text-sm text-white font-bold">
-                ⚡
-              </div>
-              <span className="font-bold tracking-tight text-slate-900">STUN-FI NOTES</span>
+              <span className="font-bold tracking-tight text-slate-900">Lighthub.ed</span>
             </div>
             <div className="flex items-center space-x-4">
               <Link href="/dashboard" className="text-xs font-semibold text-indigo-600 hover:text-indigo-500">
