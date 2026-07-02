@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import ThemeProfileMenu from '@/components/ThemeProfileMenu';
 
 // Mock data representing the per-course vector namespaces from the architecture
 const courses = [
@@ -10,19 +11,17 @@ const courses = [
 
 export default function DashboardPage() {
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
+    <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
       
       {/* GLOBAL TOP NAVIGATION */}
-      <nav className="sticky top-0 z-40 border-b border-slate-200 bg-white/80 backdrop-blur-md">
+      <nav className="sticky top-0 z-40 border-b border-slate-200 bg-white/80 backdrop-blur-md dark:border-slate-700 dark:bg-slate-950/95">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 justify-between items-center">
             <div className="flex items-center space-x-3">
               <span className="font-bold tracking-tight text-slate-900">Lighthub.ed</span>
             </div>
             <div className="flex items-center space-x-4">
-              <div className="h-9 w-9 rounded-full bg-indigo-600 flex items-center justify-center text-sm font-semibold text-white shadow-inner">
-                ST
-              </div>
+              <ThemeProfileMenu />
             </div>
           </div>
         </div>
@@ -32,12 +31,12 @@ export default function DashboardPage() {
       <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
         
         {/* HEADER SECTION */}
-        <div className="md:flex md:items-center md:justify-between border-b border-slate-200 pb-6 mb-8">
+        <div className="md:flex md:items-center md:justify-between border-b border-slate-200 pb-6 mb-8 dark:border-slate-700">
           <div className="min-w-0 flex-1">
-            <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-4xl">
               Your Study Spaces
             </h1>
-            <p className="mt-2 text-sm text-slate-500">
+            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
               Select a course vector namespace to manage files, detect gaps, or launch Panic Mode.
             </p>
           </div>
@@ -56,14 +55,14 @@ export default function DashboardPage() {
           {courses.map((course) => (
             <div 
               key={course.id}
-              className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md hover:border-slate-300 transition-all duration-200"
+              className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md hover:border-slate-300 transition-all duration-200 dark:border-slate-700 dark:bg-slate-900"
             >
               <div>
                 {/* Visual badge top right */}
                 <div className={`absolute top-0 right-0 h-2 w-full bg-gradient-to-r ${course.color}`} />
                 
                 <div className="flex items-center justify-between mt-2">
-                  <span className="inline-flex items-center rounded-md bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-800">
+                  <span className="inline-flex items-center rounded-md bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-800 dark:bg-slate-800 dark:text-slate-200">
                     {course.code}
                   </span>
                   <span className="text-xs text-slate-400 flex items-center font-medium">
@@ -93,7 +92,7 @@ export default function DashboardPage() {
               <div className="mt-8">
                 <Link
                   href={`/course/${course.id}`}
-                  className="w-full inline-flex items-center justify-center rounded-xl bg-slate-50 border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 transition-all duration-150"
+                  className="w-full inline-flex items-center justify-center rounded-xl bg-slate-50 border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 transition-all duration-150 dark:bg-slate-950 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
                 >
                   Enter Space →
                 </Link>

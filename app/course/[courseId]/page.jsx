@@ -1,6 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 import Link from 'next/link';
+import ThemeProfileMenu from '@/components/ThemeProfileMenu';
 
 export default function StudySpacePage() {
   const [messages, setMessages] = useState([
@@ -22,22 +23,20 @@ export default function StudySpacePage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col relative overflow-x-hidden">
+    <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 flex flex-col relative overflow-x-hidden">
       
       {/* GLOBAL TOP NAVIGATION */}
-      <nav className="sticky top-0 z-40 border-b border-slate-200 bg-white/80 backdrop-blur-md">
+      <nav className="sticky top-0 z-40 border-b border-slate-200 bg-white/80 backdrop-blur-md dark:border-slate-700 dark:bg-slate-950/95">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 justify-between items-center">
             <div className="flex items-center space-x-3">
               <span className="font-bold tracking-tight text-slate-900">Lighthub.ed</span>
             </div>
             <div className="flex items-center space-x-4">
-              <Link href="/dashboard" className="text-xs font-semibold text-indigo-600 hover:text-indigo-500">
+              <Link href="/dashboard" className="text-xs font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-300 dark:hover:text-indigo-200">
                 ← Dashboard
               </Link>
-              <div className="h-9 w-9 rounded-full bg-indigo-600 flex items-center justify-center text-sm font-semibold text-white">
-                ST
-              </div>
+              <ThemeProfileMenu />
             </div>
           </div>
         </div>
@@ -47,11 +46,11 @@ export default function StudySpacePage() {
       <div className="flex-1 flex flex-col lg:flex-row max-w-7xl w-full mx-auto px-4 py-6 lg:px-8 gap-6 pb-24 lg:pb-6 transition-all duration-300">
         
         {/* COLUMN 1: SIDEBAR */}
-        <aside className="w-full lg:w-64 bg-white border border-slate-200 rounded-2xl p-5 flex flex-col justify-between space-y-6 flex-shrink-0 shadow-sm">
+        <aside className="w-full lg:w-64 bg-white border border-slate-200 rounded-2xl p-5 flex flex-col justify-between space-y-6 flex-shrink-0 shadow-sm dark:bg-slate-900 dark:border-slate-700">
           <div className="space-y-5">
             <div>
               <p className="text-xxs font-bold uppercase tracking-wider text-slate-400 mb-2">Active Workspace</p>
-              <div className="flex items-center space-x-2 p-3 rounded-xl bg-indigo-50 text-indigo-700 border border-indigo-100 font-semibold text-xs">
+              <div className="flex items-center space-x-2 p-3 rounded-xl bg-indigo-50 text-indigo-700 border border-indigo-100 font-semibold text-xs dark:bg-slate-800 dark:text-indigo-200 dark:border-slate-700">
                 <span>📚</span> <span>COS 141 - Hardware</span>
               </div>
             </div>
@@ -107,7 +106,7 @@ export default function StudySpacePage() {
           </div>
 
           {/* GAP DETECTION */}
-          <div className="border border-amber-200 bg-amber-50/60 rounded-2xl p-5 space-y-3">
+          <div className="border border-amber-200 bg-amber-50/60 rounded-2xl p-5 space-y-3 dark:border-amber-400/30 dark:bg-amber-950/20">
             <div className="flex items-center space-x-2 text-amber-700 font-bold text-xs">
               <span>⚠️</span> <span>Information Gap Flagged</span>
             </div>

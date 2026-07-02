@@ -1,6 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 import Link from 'next/link';
+import ThemeProfileMenu from '@/components/ThemeProfileMenu';
 
 const initialSyllabusModules = [
   {
@@ -59,18 +60,21 @@ export default function CurriculumGapDetector() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col">
+    <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 flex flex-col">
       
       {/* GLOBAL TOP NAVIGATION */}
-      <nav className="sticky top-0 z-40 border-b border-slate-200 bg-white/80 backdrop-blur-md">
+      <nav className="sticky top-0 z-40 border-b border-slate-200 bg-white/80 backdrop-blur-md dark:border-slate-700 dark:bg-slate-950/95">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 justify-between items-center">
             <div className="flex items-center space-x-3">
               <span className="font-bold tracking-tight text-slate-900">Lighthub.ed — GAP DETECTOR</span>
             </div>
-            <Link href="/course/cos141" className="text-xs font-semibold text-indigo-600 hover:text-indigo-500">
-              ← Return to Workspace
-            </Link>
+            <div className="flex items-center space-x-4">
+              <Link href="/course/cos141" className="text-xs font-semibold text-indigo-600 hover:text-indigo-500">
+                ← Return to Workspace
+              </Link>
+              <ThemeProfileMenu />
+            </div>
           </div>
         </div>
       </nav>
@@ -79,7 +83,7 @@ export default function CurriculumGapDetector() {
       <main className="flex-1 max-w-5xl w-full mx-auto px-4 py-8 sm:px-6 lg:px-8 space-y-8">
         
         {/* TITLE HERO */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 dark:bg-slate-900 dark:border-slate-700">
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-slate-900">Syllabus Mapping Matrix</h1>
             <p className="text-xs text-slate-500 mt-1">
@@ -94,7 +98,7 @@ export default function CurriculumGapDetector() {
         {/* COMPARISON MODULE CARDS */}
         <div className="space-y-6">
           {modules.map((mod) => (
-            <div key={mod.id} className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+            <div key={mod.id} className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden dark:bg-slate-900 dark:border-slate-700">
               
               {/* Card Module Header Banner */}
               <div className={`p-4 border-b border-slate-100 flex justify-between items-center ${
@@ -113,7 +117,7 @@ export default function CurriculumGapDetector() {
                 {mod.topics.map((topic, idx) => (
                   <div key={idx} className="p-4 flex flex-col sm:flex-row justify-between sm:items-center gap-3 hover:bg-slate-50/50 transition">
                     <div className="space-y-1">
-                      <p className="text-xs font-semibold text-slate-900">{topic.name}</p>
+                      <p className="text-xs font-semibold text-slate-900 dark:text-slate-100">{topic.name}</p>
                       {/* Hidden on extra small screens, pops up on 'sm' and up */}
                       <div className="hidden sm:flex items-center space-x-2 text-xxs text-slate-400">
                         <span>Status Tracked:</span>

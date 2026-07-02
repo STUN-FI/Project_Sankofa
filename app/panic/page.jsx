@@ -1,6 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 import Link from 'next/link';
+import ThemeProfileMenu from '@/components/ThemeProfileMenu';
 
 // Mock high-yield crisis items extracted by our RAG system
 const mockSummaries = [
@@ -42,7 +43,7 @@ export default function PanicModePage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col">
+    <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 flex flex-col">
       
       {/* EMERGENCY CRISIS HEADER */}
       <header className="bg-gradient-to-r from-rose-700 via-red-600 to-rose-700 text-white shadow-md sticky top-0 z-40">
@@ -54,12 +55,15 @@ export default function PanicModePage() {
               <p className="text-xxs text-rose-100 font-medium">LLM Workspace condensed down into absolute exam essentials.</p>
             </div>
           </div>
-          <Link 
-            href="/course/cos141" 
-            className="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-xs font-bold transition text-center w-full sm:w-auto shrink-0"
-          >
-            ← Exit Crisis Room
-          </Link>
+          <div className="flex items-center space-x-3 w-full sm:w-auto justify-between">
+            <Link 
+              href="/course/cos141" 
+              className="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-xs font-bold transition text-center w-full sm:w-auto shrink-0"
+            >
+              ← Exit Crisis Room
+            </Link>
+            <ThemeProfileMenu />
+          </div>
         </div>
       </header>
 
@@ -133,7 +137,7 @@ export default function PanicModePage() {
 
         {/* COLUMN 2: ACTIVE RECALL MATRIX (Right side) */}
         <aside className="w-full lg:w-[400px] shrink-0">
-          <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4 sticky top-24">
+          <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4 sticky top-24 dark:bg-slate-900 dark:border-slate-700">
             <div>
               <h2 className="text-sm font-black uppercase tracking-wider text-slate-800">Active Recall Matrix</h2>
               <p className="text-xs text-slate-500 mt-0.5">Audit comprehension instantly via active evaluation loops.</p>
