@@ -1,5 +1,11 @@
+fastapi
+uvicorn[standard]
+nest_asyncio
+pydantic
+g4f
+python-multipart
+python-dotenv
 streamlit
 anthropic
 pdfplumber
 chromadb
-python-dotenv
