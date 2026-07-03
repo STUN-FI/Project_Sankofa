@@ -9,3 +9,7 @@ streamlit
 anthropic
 pdfplumber
 chromadb
+pypdf
+sentence-transformers
+torch
+transformers
