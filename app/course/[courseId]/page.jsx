@@ -1,7 +1,6 @@
-'use client';
-import React, { useState } from 'react';
+"use client";
+import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import ThemeProfileMenu from '@/components/ThemeProfileMenu';
 
 export default function StudySpacePage() {
   const [messages, setMessages] = useState([
@@ -10,6 +9,28 @@ export default function StudySpacePage() {
   const [input, setInput] = useState('');
   const [isMobileChatOpen, setIsMobileChatOpen] = useState(false);
   const [isDesktopChatOpen, setIsDesktopChatOpen] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+  const avatarRef = useRef(null);
+  const modalRef = useRef(null);
+
+  useEffect(() => {
+    function handleClick(e) {
+      if (
+        modalRef.current &&
+        avatarRef.current &&
+        !modalRef.current.contains(e.target) &&
+        !avatarRef.current.contains(e.target)
+      ) {
+        setShowModal(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
+
+  const openModal = () => setShowModal(true);
 
   const handleSend = (e) => {
     e.preventDefault();
@@ -23,20 +44,50 @@ export default function StudySpacePage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 flex flex-col relative overflow-x-hidden">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col relative overflow-x-hidden">
       
       {/* GLOBAL TOP NAVIGATION */}
-      <nav className="sticky top-0 z-40 border-b border-slate-200 bg-white/80 backdrop-blur-md dark:border-slate-700 dark:bg-slate-950/95">
+      <nav className="sticky top-0 z-40 border-b border-slate-200 bg-white/80 backdrop-blur-md">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 justify-between items-center">
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center">
               <span className="font-bold tracking-tight text-slate-900">Lighthub.ed</span>
             </div>
             <div className="flex items-center space-x-4">
-              <Link href="/dashboard" className="text-xs font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-300 dark:hover:text-indigo-200">
+              <Link href="/dashboard" className="text-xs font-semibold text-indigo-600 hover:text-indigo-500">
                 ← Dashboard
               </Link>
-              <ThemeProfileMenu />
+              <div className="relative">
+                <div
+                  ref={avatarRef}
+                  onClick={openModal}
+                  onMouseEnter={openModal}
+                  role="button"
+                  tabIndex={0}
+                  className="h-9 w-9 rounded-full bg-indigo-600 flex items-center justify-center text-sm font-semibold text-white cursor-pointer"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                      <path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-4.418 0-8 2.686-8 6v2h16v-2c0-3.314-3.582-6-8-6z" />
+                    </svg>
+                  </div>
+
+                {showModal && (
+                  <div ref={modalRef} className="absolute right-0 mt-2 w-44 bg-white border border-slate-200 rounded-xl p-3 shadow-lg z-50">
+                    <div className="text-xs font-semibold text-slate-700 mb-2">Preferences</div>
+                    <div className="flex items-center justify-between">
+                      <div className="text-xxs text-slate-500">Dark mode</div>
+                      <button
+                        type="button"
+                        aria-pressed={darkMode}
+                        onClick={() => setDarkMode(!darkMode)}
+                        className={`w-12 h-6 rounded-full p-1 flex items-center transition-colors ${darkMode ? 'bg-indigo-600' : 'bg-slate-200'}`}
+                      >
+                        <div className={`w-4 h-4 bg-white rounded-full shadow transform transition-transform ${darkMode ? 'translate-x-6' : 'translate-x-0'}`} />
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -46,11 +97,11 @@ export default function StudySpacePage() {
       <div className="flex-1 flex flex-col lg:flex-row max-w-7xl w-full mx-auto px-4 py-6 lg:px-8 gap-6 pb-24 lg:pb-6 transition-all duration-300">
         
         {/* COLUMN 1: SIDEBAR */}
-        <aside className="w-full lg:w-64 bg-white border border-slate-200 rounded-2xl p-5 flex flex-col justify-between space-y-6 flex-shrink-0 shadow-sm dark:bg-slate-900 dark:border-slate-700">
+        <aside className="w-full lg:w-64 bg-white border border-slate-200 rounded-2xl p-5 flex flex-col justify-between space-y-6 flex-shrink-0 shadow-sm">
           <div className="space-y-5">
             <div>
               <p className="text-xxs font-bold uppercase tracking-wider text-slate-400 mb-2">Active Workspace</p>
-              <div className="flex items-center space-x-2 p-3 rounded-xl bg-indigo-50 text-indigo-700 border border-indigo-100 font-semibold text-xs dark:bg-slate-800 dark:text-indigo-200 dark:border-slate-700">
+              <div className="flex items-center space-x-2 p-3 rounded-xl bg-indigo-50 text-indigo-700 border border-indigo-100 font-semibold text-xs">
                 <span>📚</span> <span>COS 141 - Hardware</span>
               </div>
             </div>
@@ -70,10 +121,7 @@ export default function StudySpacePage() {
 
           {/* PULSING / SHINING PANIC BUTTON */}
           <div className="pt-4 border-t border-slate-100">
-            <Link
-              href="/panic"
-              className="w-full block text-center bg-gradient-to-r from-rose-600 via-red-500 to-rose-600 text-white rounded-xl py-3 text-xs font-bold shadow-md hover:from-rose-500 hover:to-red-500 transition duration-150 shadow-rose-200 animate-pulse"
-            >
+            <Link href="/panic" className="w-full inline-flex justify-center bg-gradient-to-r from-rose-600 via-red-500 to-rose-600 text-white rounded-xl py-3 text-xs font-bold shadow-md hover:from-rose-500 hover:to-red-500 transition duration-150 shadow-rose-200 animate-pulse">
               🚨 LAUNCH PANIC MODE
             </Link>
           </div>
@@ -106,17 +154,14 @@ export default function StudySpacePage() {
           </div>
 
           {/* GAP DETECTION */}
-          <div className="border border-amber-200 bg-amber-50/60 rounded-2xl p-5 space-y-3 dark:border-amber-400/30 dark:bg-amber-950/20">
+          <div className="border border-amber-200 bg-amber-50/60 rounded-2xl p-5 space-y-3">
             <div className="flex items-center space-x-2 text-amber-700 font-bold text-xs">
               <span>⚠️</span> <span>Information Gap Flagged</span>
             </div>
             <p className="text-xs text-slate-600 leading-relaxed">
               We noticed a syllabus timeline disparity between your **Week 1 PDF** and **Week 2 PDF**. The concept of *BIOS Configuration Interrupts* was mentioned but not explicitly defined anywhere in your files.
             </p>
-            <Link
-              href="/course/cos141/gaps"
-              className="inline-flex bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs px-3 py-2 rounded-xl transition shadow-sm"
-            >
+            <Link href="/course/cos141/gaps" className="inline-flex items-center justify-center bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs px-3 py-2 rounded-xl transition shadow-sm">
               Generate Complementary Notes
             </Link>
           </div>

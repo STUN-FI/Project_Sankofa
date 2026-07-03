@@ -49,15 +49,12 @@ export default function LoginPage() {
         <div className="fixed inset-x-0 top-0 z-30 mx-auto max-w-2xl px-6 py-3 lg:hidden bg-white/95 backdrop-blur border-b border-slate-200 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-indigo-600">
+              <p className="text-sm font-semibold text-indigo-600">
                 Lighthub.ed
               </p>
               <p className="mt-1 text-xs text-slate-500">
                 AI-driven study assistant
               </p>
-            </div>
-            <div className="rounded-full bg-indigo-600 px-3 py-1 text-[0.625rem] font-semibold uppercase tracking-[0.2em] text-white">
-              beta
             </div>
           </div>
         </div>
