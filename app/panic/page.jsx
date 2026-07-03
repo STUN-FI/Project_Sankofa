@@ -1,127 +1,149 @@
-﻿ 'use client';
-import React, { useState } from 'react';
+﻿"use client";
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 
-// Mock high-yield crisis items extracted by our RAG system
-const mockSummaries = [
-  { id: 1, topic: 'BIOS Configuration Interrupts', detail: 'Interrupt vectors point to memory locations handling hardware requests. Primary key is INT 13h for low-level disk operations.' },
-  { id: 2, topic: 'POST Sequence Failure States', detail: 'Power-On Self-Test uses audible beep codes if video memory fails. 1 long, 2 short beeps usually indicates a display adapter issue.' },
-  { id: 3, topic: 'CMOS Battery Voltages', detail: 'A failing CR2032 lithium cell (below 3.0V) resets the system clock and returns BIOS variables to fallback defaults during cold boots.' },
-];
-
-const mockFlashcards = [
-  { question: 'What is the exact purpose of the POST (Power-On Self-Test)?', answer: 'To verify the presence and basic operational integrity of core hardware system components (RAM, CPU, Cache, Storage, Controllers) before executing the OS bootloader.' },
-  { question: 'What does a constant, repeating short beep code typically signal?', answer: 'A fatal power supply unit failure, motherboard regulation failure, or severe system memory (RAM) misplacement.' },
-  { question: 'What memory structure holds system configuration variables when power is completely lost?', answer: 'Non-Volatile RAM (NVRAM) or the CMOS register, kept alive by the dedicated motherboard lithium cell.' }
-];
-
 export default function PanicModePage() {
-  const [cardIndex, setCardIndex] = useState(0);
-  const [isFlipped, setIsFlipped] = useState(false);
+  const [timeLeft, setTimeLeft] = useState({ hours: 47, minutes: 59, seconds: 59 });
+  const [loadingContext, setLoadingContext] = useState(false);
+  const [cramResponse, setCramResponse] = useState('');
 
-  const handleNextCard = () => {
-    setIsFlipped(false);
-    setTimeout(() => {
-      setCardIndex((prev) => (prev + 1) % mockFlashcards.length);
-    }, 150);
+  // 48-Hour High-Intensity Countdown Timer Simulation
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev.seconds > 0) return { ...prev, seconds: prev.seconds - 1 };
+        if (prev.minutes > 0) return { ...prev, minutes: prev.minutes - 1, seconds: 59 };
+        if (prev.hours > 0) return { hours: prev.hours - 1, minutes: 59, seconds: 59 };
+        clearInterval(timer);
+        return prev;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Fast Backend Ingestion Route to pull quick summary answers directly from ChromaDB chunks
+  const triggerEmergencyCram = async (topic) => {
+    setLoadingContext(true);
+    setCramResponse('');
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: `Provide an emergency high-yield exam summary for the topic: ${topic}. Focus on key definitions, architecture, and common exam questions.` })
+      });
+      const data = await response.json();
+      setCramResponse(data.reply);
+    } catch (error) {
+      setCramResponse("Failed to connect to the local vector engine. Make sure your FastAPI backend is running.");
+    } finally {
+      setLoadingContext(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col antialiased selection:bg-rose-500 selection:text-white">
       
-      {/* EMERGENCY CRISIS HEADER */}
-      <header className="bg-gradient-to-r from-rose-700 via-red-600 to-rose-700 text-white shadow-md">
-        <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <div className="flex items-center space-x-3">
-            <span className="text-2xl animate-pulse">🚨</span>
-            <div>
-              <h1 className="text-xl font-extrabold tracking-tight">PANIC MODE ACTIVE: COS 141</h1>
-              <p className="text-xxs text-rose-100 font-medium">Llm Workspace condensed down into absolute exam essentials.</p>
-            </div>
+      {/* PANIC HEADER MODE MONITOR */}
+      <header className="border-b border-rose-100 bg-white/80 backdrop-blur-md px-6 py-4 sticky top-0 z-50 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div className="flex items-center space-x-3">
+          <div className="h-2.5 w-2.5 rounded-full bg-rose-600 animate-ping" />
+          <div>
+            <h1 className="text-sm font-black uppercase tracking-widest text-rose-600">Lighthub.ed Panic Core Active</h1>
+            <p className="text-xxs text-slate-500">COS 141 • 48-Hour Ingestion Engine Mode</p>
           </div>
-          <Link
-            href="/course/cos141"
-            className="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-xs font-bold transition text-center w-full sm:w-auto"
-          >
-            ← Exit Crisis Room
-          </Link>
         </div>
+        
+        {/* COUNTDOWN CLOCK */}
+        <div className="flex items-center space-x-2 bg-rose-50 border border-rose-200 px-4 py-2 rounded-xl">
+          <span className="text-xxs font-bold uppercase tracking-wider text-rose-700 mr-2">Time to Exam:</span>
+          <div className="font-mono text-sm font-bold text-rose-600 flex space-x-1">
+            <span>{String(timeLeft.hours).padStart(2, '0')}h</span>
+            <span className="animate-pulse">:</span>
+            <span>{String(timeLeft.minutes).padStart(2, '0')}m</span>
+            <span className="animate-pulse">:</span>
+            <span>{String(timeLeft.seconds).padStart(2, '0')}s</span>
+          </div>
+        </div>
+
+        <Link href="/course/cos141" className="text-xxs font-bold text-slate-600 hover:text-slate-900 border border-slate-200 px-3 py-1.5 rounded-lg bg-white transition shadow-sm">
+          ← Leave Panic Space
+        </Link>
       </header>
 
-      {/* CORE TWO-COLUMN CRISIS VIEW */}
-      <div className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col lg:flex-row gap-6">
+      {/* CORE WORKSPACE SPLIT LAYOUT */}
+      <div className="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
         
-        {/* PANEL 1: EMERGENCY CORE SUMMARY STRIP (Left Side) */}
-        <main className="flex-1 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
-          <div>
-            <h2 className="text-lg font-bold text-slate-900">High-Yield Crisis Summaries</h2>
-            <p className="text-xs text-slate-500 mt-0.5">Extracted system notes covering detected information gaps.</p>
+        {/* LEFT COLUMN: CRISIS RADAR HUB (5-COLS) */}
+        <main className="lg:col-span-5 flex flex-col space-y-4">
+          <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-4 shadow-sm">
+            <div>
+              <h2 className="text-sm font-bold text-slate-900">Emergency Cram Targets</h2>
+              <p className="text-xxs text-slate-500 mt-0.5">Select a high-probability target topic to fetch local vector context summaries.</p>
+            </div>
+
+            {/* TOPIC SELECTION BLOCKS */}
+            <div className="space-y-2">
+              {[
+                { title: "BIOS Interrupts & INT 13h Disk Operations", prob: "94% Match" },
+                { title: "Northbridge vs Southbridge Architecture", prob: "88% Match" },
+                { title: "POST (Power-On Self-Test) Sequence Failures", prob: "82% Match" },
+                { title: "CMOS Battery Loss & Volatile Clock Resets", prob: "75% Match" }
+              ].map((topic, i) => (
+                <button
+                  key={i}
+                  onClick={() => triggerEmergencyCram(topic.title)}
+                  className="w-full text-left p-3.5 bg-slate-50 border border-slate-100 hover:border-rose-200 hover:bg-rose-50/20 rounded-xl flex justify-between items-center group transition"
+                >
+                  <div className="space-y-0.5 max-w-[80%]">
+                    <p className="text-xs font-semibold text-slate-700 group-hover:text-rose-600 transition truncate">{topic.title}</p>
+                    <p className="text-xxs font-mono text-slate-400">ChromaDB Context Match Pool</p>
+                  </div>
+                  <span className="text-xxs font-mono bg-rose-50 text-rose-600 border border-rose-100 px-2 py-0.5 rounded-md font-bold">
+                    {topic.prob}
+                  </span>
+                </button>
+              ))}
+            </div>
           </div>
 
-          <div className="space-y-4">
-            {mockSummaries.map((summary) => (
-              <div 
-                key={summary.id}
-                className="p-4 rounded-xl border border-rose-100 bg-rose-50/20 hover:border-rose-200 transition-all"
-              >
-                <div className="flex items-start space-x-3">
-                  <span className="text-rose-600 text-sm mt-0.5">📌</span>
-                  <div className="space-y-1">
-                    <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wide">{summary.topic}</h3>
-                    <p className="text-xs text-slate-600 leading-relaxed">{summary.detail}</p>
-                  </div>
-                </div>
+          {/* HIGH-INTENSITY MEMORY JOGGERS */}
+          <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex-1 flex flex-col justify-between">
+            <div className="space-y-3">
+              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wide">Quick Recall Mnemonics</h3>
+              <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xxs text-slate-600 leading-relaxed">
+                <strong className="text-rose-600 block mb-1">POST Order sequence:</strong>
+                CPU Register Verification → ROM BIOS Checksum → CMOS Integrity → Timer Check → Video Controller Initialization.
               </div>
-            ))}
+            </div>
+            <div className="pt-4 border-t border-slate-100 text-center text-xxs text-slate-400 font-medium">
+              Lighthub.ed Engine v1.0 • Low-Bandwidth Offline Optimization
+            </div>
           </div>
         </main>
 
-        {/* PANEL 2: INTERACTIVE FLASHCARD ENGINE (Right Side) */}
-        <section className="w-full lg:w-[450px] bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between space-y-6">
-          <div>
-            <h2 className="text-lg font-bold text-slate-900">Active Recall Matrix</h2>
-            <p className="text-xs text-slate-500 mt-0.5">Flip the card to audit your understanding instantly.</p>
+        {/* RIGHT COLUMN: REVISION RECEPTOR EXECUTOR (7-COLS) */}
+        <section className="lg:col-span-7 bg-white border border-slate-200 rounded-2xl flex flex-col overflow-hidden min-h-[500px] shadow-sm">
+          <div className="p-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+            <span className="text-xs font-bold tracking-wide text-slate-700">Active High-Yield Vector Synthesis</span>
+            <span className="h-2 w-2 rounded-full bg-emerald-500 shadow shadow-emerald-500" title="Backend pipeline active" />
           </div>
 
-          {/* THE FLASHCARD CONTAINER */}
-          <div 
-            onClick={() => setIsFlipped(!isFlipped)}
-            className={`flex-1 min-h-[260px] max-h-[300px] rounded-2xl border cursor-pointer p-6 flex flex-col justify-between shadow-sm transform transition-all duration-300 ${
-              isFlipped 
-                ? 'bg-slate-900 text-white border-slate-800 rotate-1' 
-                : 'bg-slate-50 text-slate-900 border-slate-200 hover:border-slate-300 hover:bg-slate-100/50 -rotate-1'
-            }`}
-          >
-            <div>
-              <span className={`text-xxs font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full ${
-                isFlipped ? 'bg-indigo-500/20 text-indigo-400' : 'bg-slate-200/80 text-slate-600'
-              }`}>
-                {isFlipped ? '🧠 Core Answer Key' : '❓ Crisis Prompt'}
-              </span>
-              
-              <p className={`mt-6 text-sm font-semibold leading-relaxed tracking-tight ${
-                isFlipped ? 'text-slate-200' : 'text-slate-900'
-              }`}>
-                {isFlipped ? mockFlashcards[cardIndex].answer : mockFlashcards[cardIndex].question}
-              </p>
-            </div>
-
-            <div className="text-center text-xxs font-bold uppercase tracking-wider text-slate-400 pt-4 border-t border-dashed border-slate-300/40">
-              {isFlipped ? 'Tap anywhere to hide answer' : 'Tap anywhere to reveal answer'}
-            </div>
-          </div>
-
-          {/* CARD METRIC CONTROLS */}
-          <div className="flex justify-between items-center pt-2">
-            <span className="text-xs font-semibold text-slate-400">
-              Card {cardIndex + 1} of {mockFlashcards.length}
-            </span>
-            <button
-              onClick={handleNextCard}
-              className="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition shadow-sm"
-            >
-              Next Card →
-            </button>
+          <div className="flex-1 p-5 overflow-y-auto text-xs text-slate-600 space-y-4">
+            {loadingContext ? (
+              <div className="flex flex-col items-center justify-center h-full space-y-2 text-slate-400">
+                <span className="animate-spin text-lg">⏳</span>
+                <p className="text-xxs tracking-wider uppercase animate-pulse">Running vector lookup & context extraction...</p>
+              </div>
+            ) : cramResponse ? (
+              <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 leading-relaxed whitespace-pre-wrap text-slate-800 border-l-2 border-l-rose-500 shadow-inner">
+                {cramResponse}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center h-full text-center max-w-xs mx-auto space-y-2 text-slate-400">
+                <span className="text-xl">⚡</span>
+                <p className="text-xxs leading-relaxed">Select an Emergency Cram Target on the left menu grid to generate instantaneous layout-optimized study notes direct from ChromaDB.</p>
+              </div>
+            )}
           </div>
         </section>
 

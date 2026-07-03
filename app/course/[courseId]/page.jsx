@@ -11,8 +11,18 @@ export default function StudySpacePage() {
   const [isDesktopChatOpen, setIsDesktopChatOpen] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
+  
+  // States for API communication tracking
+  const [uploading, setUploading] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState(null);
+  const [indexedFiles, setIndexedFiles] = useState([
+    { id: 1, name: 'Week1_Intro_Maintenance.pdf' },
+    { id: 2, name: 'Week2_Motherboards.pdf' }
+  ]);
+
   const avatarRef = useRef(null);
   const modalRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     function handleClick(e) {
@@ -32,19 +42,107 @@ export default function StudySpacePage() {
 
   const openModal = () => setShowModal(true);
 
-  const handleSend = (e) => {
+  // --- BACKEND API HANDLERS ---
+
+  // 1. File Upload Processing
+  const handleFileUpload = async (file) => {
+    if (!file) return;
+    if (file.type !== "application/pdf" && !file.name.endsWith('.pdf')) {
+      alert("Please upload a valid PDF document.");
+      return;
+    }
+
+    setUploading(true);
+    setUploadStatus("Processing document analytics...");
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Upload pipeline failed.");
+      }
+
+      const data = await response.json();
+      setUploadStatus(`Success! Split into ${data.total_chunks} AI chunks.`);
+      
+      setIndexedFiles(prev => [...prev, { id: Date.now(), name: data.filename }]);
+      
+      setMessages(prev => [...prev, { 
+        sender: 'ai', 
+        text: `Successfully ingested "${data.filename}". The context engine split the data into ${data.total_chunks} vector chunks. Preview: "${data.preview}..."` 
+      }]);
+
+    } catch (error) {
+      console.error("Transmission error:", error);
+      setUploadStatus(`Ingestion failed: ${error.message}`);
+    } finally {
+      setUploading(false);
+      // setTimeout(() => setUploadStatus(null), 5000);
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    handleFileUpload(file);
+  };
+
+  // 2. Chat Query Handler
+  const handleSend = async (e) => {
     e.preventDefault();
     if (!input.trim()) return;
-    setMessages([...messages, { sender: 'user', text: input }]);
+    
+    const userQuery = input;
+    setMessages(prev => [...prev, { sender: 'user', text: userQuery }]);
     setInput('');
     
-    setTimeout(() => {
-      setMessages(prev => [...prev, { sender: 'ai', text: "I'm processing that query against your indexed PDFs. (Backend FastAPI endpoint connection goes here!)" }]);
-    }, 800);
+    setMessages(prev => [...prev, { sender: 'ai', text: "Analyzing query against indexed vector segments..." }]);
+
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message: userQuery }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Vector core lookup failed.");
+      }
+
+      const data = await response.json();
+      
+      setMessages(prev => {
+        const standardThread = [...prev];
+        standardThread.pop(); 
+        return [...standardThread, { 
+          sender: 'ai', 
+          text: data.reply 
+        }];
+      });
+    } catch (error) {
+      setMessages(prev => {
+        const standardThread = [...prev];
+        standardThread.pop();
+        return [...standardThread, { sender: 'ai', text: "Could not establish server execution link. Verify FastAPI terminal is active on port 8000." }];
+      });
+    }
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col relative overflow-x-hidden">
+    <div className={`min-h-screen text-slate-900 flex flex-col relative overflow-x-hidden ${darkMode ? 'dark bg-slate-950 text-slate-100' : 'bg-slate-50'}`}>
       
       {/* GLOBAL TOP NAVIGATION */}
       <nav className="sticky top-0 z-40 border-b border-slate-200 bg-white/80 backdrop-blur-md">
@@ -65,11 +163,11 @@ export default function StudySpacePage() {
                   role="button"
                   tabIndex={0}
                   className="h-9 w-9 rounded-full bg-indigo-600 flex items-center justify-center text-sm font-semibold text-white cursor-pointer"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                      <path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-4.418 0-8 2.686-8 6v2h16v-2c0-3.314-3.582-6-8-6z" />
-                    </svg>
-                  </div>
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-4.418 0-8 2.686-8 6v2h16v-2c0-3.314-3.582-6-8-6z" />
+                  </svg>
+                </div>
 
                 {showModal && (
                   <div ref={modalRef} className="absolute right-0 mt-2 w-44 bg-white border border-slate-200 rounded-xl p-3 shadow-lg z-50">
@@ -109,17 +207,16 @@ export default function StudySpacePage() {
             <div>
               <p className="text-xxs font-bold uppercase tracking-wider text-slate-400 mb-2">Indexed Files</p>
               <div className="space-y-1.5 max-h-36 lg:max-h-none overflow-y-auto text-xs text-slate-600">
-                <div className="p-2.5 bg-slate-50 rounded-xl truncate border border-slate-100 flex items-center space-x-2">
-                  <span>📄</span> <span className="truncate">Week1_Intro_Maintenance.pdf</span>
-                </div>
-                <div className="p-2.5 bg-slate-50 rounded-xl truncate border border-slate-100 flex items-center space-x-2">
-                  <span>📄</span> <span className="truncate">Week2_Motherboards.pdf</span>
-                </div>
+                {indexedFiles.map(file => (
+                  <div key={file.id} className="p-2.5 bg-slate-50 rounded-xl truncate border border-slate-100 flex items-center space-x-2">
+                    <span>📄</span> <span className="truncate">{file.name}</span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
 
-          {/* PULSING / SHINING PANIC BUTTON */}
+          {/* PANIC BUTTON */}
           <div className="pt-4 border-t border-slate-100">
             <Link href="/panic" className="w-full inline-flex justify-center bg-gradient-to-r from-rose-600 via-red-500 to-rose-600 text-white rounded-xl py-3 text-xs font-bold shadow-md hover:from-rose-500 hover:to-red-500 transition duration-150 shadow-rose-200 animate-pulse">
               🚨 LAUNCH PANIC MODE
@@ -135,7 +232,6 @@ export default function StudySpacePage() {
               <p className="text-xs text-slate-500 mt-1">Computer Hardware Maintenance and Troubleshooting Vector Context</p>
             </div>
             
-            {/* Desktop-only chat restore button when sidebar is closed */}
             {!isDesktopChatOpen && (
               <button 
                 onClick={() => setIsDesktopChatOpen(true)}
@@ -147,10 +243,32 @@ export default function StudySpacePage() {
           </div>
 
           {/* DRAG & DROP UPLOAD */}
-          <div className="border-2 border-dashed border-slate-200 hover:border-indigo-400 rounded-2xl p-8 text-center bg-slate-50 cursor-pointer transition-all">
-            <div className="text-2xl mb-2">📥</div>
-            <p className="text-xs font-semibold text-slate-700">Drag & drop course PDFs or image documents here</p>
-            <p className="text-xxs text-slate-400 mt-1">Supports standard text PDFs or Scanned/Handwritten content via OCR</p>
+          <div 
+            onClick={() => fileInputRef.current.click()}
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
+            className={`border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all ${
+              uploading ? 'border-indigo-500 bg-indigo-50/40 animate-pulse' : 'border-slate-200 hover:border-indigo-400 bg-slate-50'
+            }`}
+          >
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              onChange={(e) => handleFileUpload(e.target.files[0])} 
+              className="hidden" 
+              accept=".pdf"
+            />
+            <div className="text-2xl mb-2">{uploading ? "⏳" : "📥"}</div>
+            <p className="text-xs font-semibold text-slate-700">
+              {uploading ? "Parsing vector content partitions..." : "Drag & drop course PDFs here or click to browse"}
+            </p>
+            <p className="text-xxs text-slate-400 mt-1">Files are instantly segmented into text chunks inside the local sandbox</p>
+            
+            {uploadStatus && (
+              <p className="mt-2 text-xxs font-bold text-indigo-600 transition-all">
+                {uploadStatus}
+              </p>
+            )}
           </div>
 
           {/* GAP DETECTION */}
@@ -167,7 +285,7 @@ export default function StudySpacePage() {
           </div>
         </main>
 
-        {/* COLUMN 3: DESKTOP AI CONTEXT CHAT ENGINE (With open/close handler toggle) */}
+        {/* COLUMN 3: DESKTOP CHAT ENGINE */}
         {isDesktopChatOpen && (
           <section className="hidden lg:flex w-80 bg-white border border-slate-200 rounded-2xl flex-col justify-between flex-shrink-0 shadow-sm animate-in slide-in-from-right duration-200">
             <div className="p-4 border-b border-slate-100 bg-slate-50/50 rounded-t-2xl flex justify-between items-center">
@@ -205,6 +323,7 @@ export default function StudySpacePage() {
                   placeholder="Ask context question..." 
                   className="w-full bg-transparent border-0 py-2.5 pl-3 pr-10 text-xs text-slate-900 focus:ring-0"
                 />
+                <input type="submit" className="hidden" />
                 <button type="submit" className="absolute right-3 text-indigo-600 font-bold text-sm">➔</button>
               </div>
             </form>

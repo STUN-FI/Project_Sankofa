@@ -1,7 +1,7 @@
 from pathlib import Path
 import re
 
-root = Path(r"C:\Users\Stunna\OneDrive\Desktop\project_sankofa")
+root = Path(r"C:\Users\Stunna\OneDrive\Desktop\Lighthub.ed")
 
 # Files to clean within app directory
 for path in root.rglob('*.jsx'):

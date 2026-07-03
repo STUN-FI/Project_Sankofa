@@ -1,7 +1,7 @@
 from pathlib import Path
 import re
 
-root = Path(r"C:\Users\Stunna\OneDrive\Desktop\project_sankofa")
+root = Path(r"C:\Users\Stunna\OneDrive\Desktop\Lighthub.ed")
 
 def remove_theme_from_file(path: Path) -> bool:
     text = path.read_text(encoding='utf8')
